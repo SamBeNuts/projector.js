@@ -1,0 +1,360 @@
+/******* NORMALIZE *******/
+
+html, body, div, span, iframe, p, pre, a, code, img, q, s, small, strong, sub, sup, var, b, u, i, center,
+ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
+canvas, embed, figure, figcaption, footer, header, main, audio, video
+  margin: 0
+  padding: 0
+  border: 0
+  font-size: 100%
+  font-family: inherit
+  vertical-align: baseline
+
+figcaption, figure, footer, header, main
+  display: block
+
+html
+  line-height: 1
+  -webkit-text-size-adjust: 100%
+
+hr
+  box-sizing: content-box
+  height: 0
+  overflow: visible
+
+a
+  background-color: transparent
+
+b, strong
+  font-weight: bolder
+
+small
+  font-size: 80%
+
+sub,sup
+  font-size: 75%
+  line-height: 0
+  position: relative
+  vertical-align: baseline
+
+sub
+  bottom: -0.25em
+
+sup
+  top: -0.5em
+
+img
+  border-style: none
+
+button, input, select, textarea
+  font-family: inherit
+  font-size: 100%
+  line-height: 1.15
+  margin: 0
+
+button, input
+  overflow: visible
+
+button, select
+  text-transform: none
+
+button, [type="button"], [type="reset"], [type="submit"]
+  -webkit-appearance: button
+
+button::-moz-focus-inner, [type="button"]::-moz-focus-inner, [type="reset"]::-moz-focus-inner, [type="submit"]::-moz-focus-inner
+  border-style: none
+  padding: 0
+
+button:-moz-focusring, [type="button"]:-moz-focusring, [type="reset"]:-moz-focusring, [type="submit"]:-moz-focusring
+  outline: 1px dotted ButtonText
+
+fieldset
+  padding: 0.35em 0.75em 0.625em
+
+legend
+  box-sizing: border-box
+  color: inherit
+  display: table
+  max-width: 100%
+  padding: 0
+  white-space: normal
+
+progress
+  vertical-align: baseline
+
+textarea
+  overflow: auto
+
+[type="checkbox"], [type="radio"]
+  box-sizing: border-box
+  padding: 0
+
+[type="number"]::-webkit-inner-spin-button, [type="number"]::-webkit-outer-spin-button
+  height: auto
+
+[type="search"]
+  -webkit-appearance: textfield
+  outline-offset: -2px
+
+[type="search"]::-webkit-search-decoration
+  -webkit-appearance: none
+
+::-webkit-file-upload-button
+  -webkit-appearance: button
+  font: inherit
+
+[hidden]
+  display: none
+
+/******* IMPART STYLES *******/
+
+$color_black: #1e1e1e
+$color_grey: #a8a8a8
+$color_pink: #d96a6a
+$color_white: #e0e0e0
+
+body
+  font-family: Arial, Helvetica, sans-serif
+
+a
+  text-decoration: none
+
+p
+  margin: 0
+
+.lds-ring
+  display: inline-block
+  position: absolute
+  width: 64px
+  height: 64px
+  top: 50%
+  left: 50%
+  margin-top: -32px
+  margin-left: -32px
+  div
+    box-sizing: border-box
+    display: block
+    position: absolute
+    width: 51px
+    height: 51px
+    margin: 6px
+    border: 6px solid
+    border-radius: 50%
+    animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite
+    border-color: #fff transparent transparent transparent
+    &:nth-child(1)
+      animation-delay: -0.45s
+    &:nth-child(2)
+      animation-delay: -0.3s
+    &:nth-child(3)
+      animation-delay: -0.15s
+
+@keyframes lds-ring
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)
+
+.keybind
+  border: 2px $color_white solid
+  padding: 5px
+  margin: 3px
+
+.checkbox
+  div
+    position: relative
+    width: 14px
+    height: 14px
+    margin: 5px 5px 5px 0
+    border: 1px $color_grey solid
+    cursor: pointer
+    display: inline-block
+    vertical-align: middle
+    transition: border-color 300ms ease
+  &.checked div::before
+    content: ''
+    position: absolute
+    border-color: $color_black
+    border-style: solid
+    border-width: 0 5px 5px 0
+    height: 14px
+    width: 7px
+    top: 0
+    left: 0
+    margin-top: -5px
+    margin-left: 1px
+    transform: rotate(45deg)
+  &:not(.checked) div:hover
+    border-color: $color_black
+  &.checked div
+    border: none
+    margin: 6px 6px 6px 1px
+  span
+    display: inline-block
+    font-size: 16px
+    padding-top: 2px
+    vertical-align: middle
+
+/******* OBJECT DEFAULT STYLES *******/
+
+.object
+  position: absolute
+  text-align: center
+
+.object a
+  color: #ffffff
+
+.object img
+  width: 100%
+  height: 100%
+
+/******* SLIDES *******/
+
+html, body, .slide, .upper_layer, .pause, .loading, .end
+  position: absolute
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+
+body
+  background-color: $color_black
+
+body, .slides
+  overflow: hidden
+
+.slides
+  position: absolute
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+
+.slide
+  visibility: hidden
+
+.past, .active, .future
+  visibility: visible
+
+/******* PROJECTOR ELEMENTS *******/
+
+.pause, .end
+  visibility: hidden
+  background-color: $color_black
+  text-align: center
+  color: $color_white
+  font-size: 20px
+  p
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    line-height: 60px
+  b
+    font-size: 60px
+
+.pause[data-pause='true'], .end[data-end='true']
+  visibility: visible
+
+.controls
+  position: absolute
+  bottom: 15px
+  right: 25px
+  visibility: hidden
+  &[data-controls='true']
+    visibility: visible
+  img:first-child
+    transform: rotate(180deg)
+    margin-right: 15px
+  img
+    height: 30px
+    width: auto
+    opacity: 0.4
+    cursor: pointer
+    transition: opacity 300ms ease
+    &:hover
+      opacity: 1
+
+.upper_layer
+  visibility: visible
+  cursor: default
+  &[data-selection='true']
+    visibility: hidden
+  &[data-cursor='false']
+    cursor: none
+
+
+.progress
+  position: absolute
+  left: 0
+  bottom: 0
+  width: 0
+  height: 5px
+  background-color: $color_pink
+  visibility: hidden
+  transition: width 300ms ease
+  &[data-progress='true']
+    visibility: visible
+
+.menu
+  position: absolute
+  height: 100%
+  max-height: 100%
+  width: auto
+  max-width: 350px
+  top: 0
+  left: 0
+  display: flex
+  flex-direction: column
+  transform: translateX(-100%)
+  background-color: $color_white
+  transition: transform 100ms ease
+  &[data-menu='true']
+    transform: translateX(0)
+  .top_logo
+    position: relative
+    text-align: center
+    width: 100%
+    background-color: $color_black
+    img
+      width: 180px
+      height: auto
+      margin: 20px 25px
+  .bottom_stop
+    position: relative
+    bottom: 0
+    left: 0
+    width: 100%
+    text-align: center
+    background-color: $color_pink
+    cursor: pointer
+    p
+      font-weight: bold
+      font-size: 16px
+      color: $color_white
+      margin: 15px 25px
+      line-height: 25px
+  .content
+    position: relative
+    width: auto
+    padding: 15px
+    color: $color_black
+    line-height: 20px
+    font-size: 16px
+    font-variant: small-caps
+    overflow-y: auto
+    flex-grow: 1
+    .content_part
+      margin-bottom: 15px
+      &:last-child
+        margin-bottom: 0
+      p, .option
+        margin-bottom: 5px
+      .title
+        font-weight: bold
+        font-size: 20px
+      .info
+        color: $color_grey
+        font-size: 14px
+      .shortcut
+        line-height: 16px
+        font-size: 14px
