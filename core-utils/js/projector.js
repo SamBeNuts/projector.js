@@ -31,13 +31,11 @@
         defaultTransitionOptions: {},
         heightSlide: 1080,
         history: false,
-        keyboard: true,
         loop: false,
         mouseWheel: true,
         progress: true,
         resizeSlides: true,
         selectionEnabled: true,
-        selectionLayout: false,
         speakerWindow: false,
         widthSlide: 1920
     };
@@ -48,7 +46,10 @@
         initialized: false,
         loaded: false,
         nbSlide: 0,
+        menu: true,
+        pause: false,
         scale: 1,
+        selection: false,
         slideActive: -1,
         userAgent: null
     };
@@ -72,10 +73,8 @@
             resize_option_info: 'Adapte la taille de la diapositive à l\'écran tout en conservant le ratio',
             loop_option: 'Lire en boucle',
             loop_option_info: 'Après la dernière diapositive reviens à la première',
-            keyboard_option: 'Contrôler avec le clavier',
-            keyboard_option_info: 'Voir les raccourcis pour plus de détails',
             autoplay_option: 'Lecture automatique',
-            autoplay_option_info: 'Passe à la diapositive suivante automatiquement (n\'active pas les animations)',
+            autoplay_option_info: 'Passe à la diapositive suivante automatiquement',
             mousewheel_option: 'Contrôler avec la molette',
             mousewheel_option_info: 'Permet de contrôler le diaporama avec la molette de la souris',
             cursor_option: 'Cacher le curseur',
@@ -129,11 +128,11 @@
             '<img src="core-utils/media/projector_controls_icon.png" onclick="nextSlide()">', false);
 
         selector.pause = createUIElement(selector.body, 'div', 'pause', {
-            pause: false
+            pause: slidesAttributes.pause
         }, '<p data-trad="pause"></p>', false);
 
         selector.menu = createUIElement(selector.body, 'div', 'menu', {
-            menu: true
+            menu: slidesAttributes.menu
         }, '<div class="top_logo">' +
             '    <a href="https://www.impart.com"><img src="core-utils/media/logo_negative.png"></a>' +
             '</div>' +
@@ -154,23 +153,23 @@
             '<div class="bottom_stop" onclick="window.close();">' +
             '    <p data-trad="stop_presenting"></p>' +
             '</div>', false);
-        createOptionMenu('fullscreen', 'Projector.checkboxClick(this, Projector.toggleFullscreen, []);',
+        createOptionMenu('fullscreen', 'Projector.toggleFullscreen();',
             false, isFullscreen());
-        createOptionMenu('controls', 'Projector.checkboxClick(this, Projector.toggleData, [selector.controls, \'controls\']);',
+        createOptionMenu('controls', 'Projector.toggleControls(this);',
             false, settings.controls);
-        createOptionMenu('keyboard', 'Projector.checkboxClick(this, Projector.toggleData, [selector.slides, \'keyboard\']);',
-            true, settings.keyboard);
-        createOptionMenu('mousewheel', 'Projector.checkboxClick(this, Projector.toggleData, [selector.slides, \'mousewheel\']);',
+        createOptionMenu('mousewheel', 'Projector.toggleMouseWheel(this);',
             true, settings.mouseWheel);
-        createOptionMenu('cursor', 'Projector.checkboxClick(this, Projector.toggleData, [selector.upper_layer, \'nocursor\']);',
+        createOptionMenu('cursor', 'Projector.toggleCursorVisible(this);',
             true, settings.cursorVisible);
-        createOptionMenu('selection', 'Projector.checkboxClick(this, Projector.toggleData, [selector.upper_layer, \'selection\']);',
+        createOptionMenu('selection', 'Projector.toggleSelection(this);',
             true, settings.selectionEnabled);
-        createOptionMenu('progress', 'Projector.checkboxClick(this, Projector.toggleData, [selector.progress, \'progress\']);',
+        createOptionMenu('progress', 'Projector.toggleProgress(this);',
             false, settings.progress);
-        createOptionMenu('loop', 'Projector.checkboxClick(this, Projector.toggleData, [selector.slides, \'loop\']);',
+        createOptionMenu('loop', 'Projector.toggleLoop(this);',
             true, settings.loop);
-        createOptionMenu('resize', 'Projector.checkboxClick(this, Projector.toggleData, [selector.slides, \'resize\']);Projector.slidesResize();',
+        createOptionMenu('autoplay', 'Projector.toggleAutoplay(this);',
+            true, settings.autoplay);
+        createOptionMenu('resize', 'Projector.toggleResize(this);',
             true, settings.resizeSlides);
 
         //Events
@@ -183,30 +182,28 @@
 
         document.addEventListener("keyup", function(key) {
             if (key.code === "KeyP")
-                toggleData(selector.pause, "pause");
+                togglePause();
             else if (key.code === "Semicolon")
-                toggleData(selector.menu, "menu");
+                toggleMenu();
             else if (key.code === "KeyR")
                 goSlide(0);
             else if (key.code === "Escape" || key.code === "F5" || key.code === "F11" || key.code === "KeyF")
-                checkboxClick(document.querySelector("#fullscreen div"), toggleFullscreen, []);
+                toggleFullscreen();
             else if ((key.code === "ArrowLeft" || key.code === "ArrowDown" || key.code === "Backspace") &&
-                selector.pause.dataset.pause === "false" && selector.slides.dataset.keyboard === "true")
+                !slidesAttributes.pause)
                 previousSlide();
             else if ((key.code === "ArrowRight" || key.code === "ArrowUp" || key.code === "Space" || key.code === "Enter") &&
-                selector.pause.dataset.pause === "false" && selector.slides.dataset.keyboard === "true")
+                !slidesAttributes.pause)
                 nextSlide();
         }, false);
 
         selector.upperLayer.addEventListener("mouseup", function(key){
-            if ((key.button === 0 || key.button === 1) && selector.pause.dataset.pause === "false" &&
-                selector.upper_layer.dataset.selection === "false")
+            if ((key.button === 0 || key.button === 1) && !slidesAttributes.pause && !settings.selectionEnabled)
                 nextSlide();
         },false);
 
         document.addEventListener("wheel", function(key){
-            if (selector.slides.dataset.mousewheel === "true" && selector.pause.dataset.pause === "false" &&
-                selector.menu.dataset.menu === "false"){
+            if (settings.mouseWheel && !slidesAttributes.pause && !slidesAttributes.menu){
                 if (key.deltaY > 0) previousSlide();
                 else if (key.deltaY < 0) nextSlide();
             }
@@ -289,6 +286,51 @@
         }, 1000 );
     }
 
+    function togglePause(){
+        slidesAttributes.pause = !slidesAttributes.pause;
+        selector.pause.dataset.pause = (!deserializeString(selector.pause.dataset.pause)).toString();
+    }
+
+    function toggleMenu(){
+        slidesAttributes.menu = !slidesAttributes.menu;
+        selector.menu.dataset.menu = (!deserializeString(selector.menu.dataset.menu)).toString();
+    }
+
+    function toggleFullscreen() {
+        toggleChecked(document.querySelector('#fullscreen'));
+        if (!isFullscreen()) {
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+            else if (document.documentElement.msRequestFullscreen) document.documentElement.msRequestFullscreen();
+            else if (document.documentElement.mozRequestFullScreen) document.documentElement.mozRequestFullScreen();
+            else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+            else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+    }
+
+    function isFullscreen(){
+        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+    }
+
+    function toggleControls(el){
+        settings.controls = !settings.controls;
+        selector.controls.dataset.controls = (!deserializeString(selector.controls.dataset.controls)).toString();
+        toggleChecked(el.parentElement);
+    }
+
+    function toggleMouseWheel(el){
+        settings.mouseWheel = !settings.mouseWheel;
+        toggleChecked(el.parentElement);
+    }
+
+    function toggleCursorVisible(value){
+        settings.cursorVisible = value;
+        cursorVisible();
+    }
+
     function cursorVisible(){
         if (settings.cursorVisible === 'auto'){
             document.addEventListener('mousemove', cursorVisibleTiming, false);
@@ -311,6 +353,29 @@
         }, settings.cursorVisibleTiming);
     }
 
+    function toggleSelection(el){
+        settings.selectionEnabled = !settings.selectionEnabled;
+        selector.upperLayer.dataset.selection = (!deserializeString(selector.upperLayer.dataset.selection)).toString();
+        toggleChecked(el.parentElement);
+    }
+
+    function toggleProgress(el){
+        settings.progress = !settings.progress;
+        selector.progress.dataset.progress = (!deserializeString(selector.progress.dataset.progress)).toString();
+        toggleChecked(el.parentElement);
+    }
+
+    function toggleLoop(el){
+        settings.loop = !settings.loop;
+        toggleChecked(el.parentElement);
+    }
+
+    function toggleAutoplay(el){
+        settings.autoplay = !settings.autoplay;
+        toggleChecked(el.parentElement);
+        autoplay();
+    }
+
     function autoplay(){
         if (settings.autoplay){
             slidesAttributes.autoplayId = window.setInterval(nextSlide, settings.autoplayTiming);
@@ -318,6 +383,12 @@
             window.clearInterval(slidesAttributes.autoplayId);
             slidesAttributes.autoplayId = null;
         }
+    }
+
+    function toggleResize(el){
+        settings.resizeSlides = !settings.resizeSlides;
+        toggleChecked(el.parentElement);
+        resizeSlides();
     }
 
     function createNotPremiumEnd(){
@@ -330,34 +401,6 @@
         img.style.width = "200px";
         img.style.height = "auto";
         selector.end.appendChild(img);
-    }
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) {
-                document.documentElement.msRequestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) {
-                document.documentElement.webkitRequestFullscreen();
-            }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
-        }
-    }
-
-    function isFullscreen(){
-        return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
     }
 
     function updateProgress() {
@@ -376,18 +419,8 @@
 
     }
 
-    function toggleChecboxAndData(el, attr){
-        document.querySelector("#" + attr).classList.toggle("checked");
-        toggleData(el, attr);
-    }
-
-    function toggleData(el, attr){
-        el.dataset[attr] = (!deserializeString(el.dataset[attr])).toString();
-    }
-
-    function checkboxClick(el, func, parameters){
-        el.parentElement.classList.toggle('checked');
-        if (func !== null) func.apply(window, parameters);
+    function toggleChecked(el){
+        el.classList.toggle('checked');
     }
 
     function pushObject(obj1, obj2) {
@@ -407,10 +440,20 @@
 
     Projector = {
         start: start,
-        resizeSlides: resizeSlides,
+        previousSlide: previousSlide,
+        nextSlide: nextSlide,
+        goSlide: goSlide,
         toggleFullscreen: toggleFullscreen,
-        toggleData: toggleData,
-        checkboxClick: checkboxClick,
+        togglePause: togglePause,
+        toggleMenu: toggleMenu,
+        toggleControls: toggleControls,
+        toggleMouseWheel: toggleMouseWheel,
+        toggleCursorVisible: toggleCursorVisible,
+        toggleSelection: toggleSelection,
+        toggleProgress: toggleProgress,
+        toggleLoop: toggleLoop,
+        toggleAutoplay: toggleAutoplay,
+        toggleResize: toggleResize,
         settings: settings,
         selector: selector
     };
