@@ -41,6 +41,7 @@
     };
 
     let slidesAttributes = {
+        animationActive: 0,
         autoplayId: null,
         cursorVisibleTimingId: null,
         initialized: false,
@@ -124,8 +125,8 @@
 
         selector.controls = createUIElement(selector.body, 'div', 'controls', {
             controls: settings.controls
-        }, '<img src="core-utils/media/projector_controls_icon.png" onclick="previousSlide()">' +
-            '<img src="core-utils/media/projector_controls_icon.png" onclick="nextSlide()">', false);
+        }, '<img src="core-utils/media/projector_controls_icon.png" onclick="Projector.previous()">' +
+            '<img src="core-utils/media/projector_controls_icon.png" onclick="Projector.next()">', false);
 
         selector.pause = createUIElement(selector.body, 'div', 'pause', {
             pause: slidesAttributes.pause
@@ -186,26 +187,26 @@
             else if (key.code === "Semicolon")
                 toggleMenu();
             else if (key.code === "KeyR")
-                goSlide(0);
+                go(0, 0);
             else if (key.code === "Escape" || key.code === "F5" || key.code === "F11" || key.code === "KeyF")
                 toggleFullscreen();
             else if ((key.code === "ArrowLeft" || key.code === "ArrowDown" || key.code === "Backspace") &&
                 !slidesAttributes.pause)
-                previousSlide();
+                previous();
             else if ((key.code === "ArrowRight" || key.code === "ArrowUp" || key.code === "Space" || key.code === "Enter") &&
                 !slidesAttributes.pause)
-                nextSlide();
+                next();
         }, false);
 
         selector.upperLayer.addEventListener("mouseup", function(key){
             if ((key.button === 0 || key.button === 1) && !slidesAttributes.pause && !settings.selectionEnabled)
-                nextSlide();
+                next();
         },false);
 
         document.addEventListener("wheel", function(key){
             if (settings.mouseWheel && !slidesAttributes.pause && !slidesAttributes.menu){
-                if (key.deltaY > 0) previousSlide();
-                else if (key.deltaY < 0) nextSlide();
+                if (key.deltaY > 0) previous();
+                else if (key.deltaY < 0) next();
             }
         },false);
 
@@ -213,23 +214,31 @@
         selector.slides.style.width = settings.widthSlide + "px";
         selector.slides.style.height = settings.heightSlide + "px";
         populateTrad();
+        populateTransitions();
         setupPostMessage();
         scrollPrevention();
         cursorVisible();
+        updateControls();
+        updateProgress();
+        resizeSlides();
         createNotPremiumEnd();
-        autoplay();
 
         //Loading end
-        selector.body.removeChild(selector.loading);
-        delete selector.loading;
-        slidesAttributes.started = true;
+        slidesAttributes.loaded = true;
+        window.addEventListener("load", function(){
+            selector.body.removeChild(selector.loading);
+            delete selector.loading;
+            slidesAttributes.started = true;
+            autoplay();
+            next();
+        },false);
     }
 
     function resizeSlides() {
-        if (selector.slides.dataset.resize === 'true'){
+        if (settings.resizeSlides){
             slidesAttributes.scale = Math.min(
-                window.innerHeight/selector.slides.dataset.height,
-                window.innerWidth/selector.slides.dataset.width
+                window.innerHeight/settings.heightSlide,
+                window.innerWidth/settings.widthSlide
             );
             selector.slides.style.transform = 'translate(-50%, -50%) scale(' + slidesAttributes.scale + ')';
         }else{
@@ -263,6 +272,19 @@
         document.querySelectorAll('[data-trad]').forEach(function(el){
             el.innerHTML = trad[document.documentElement.lang][el.dataset.trad];
         });
+    }
+
+    function populateTransitions(){
+        if(settings.defaultTransition !== 'none'){
+            let s;
+            for(let i = 0; i < slidesAttributes.nbSlide; i++){
+                s = selector.slides.children[i].dataset;
+                if (s.transition === undefined){
+                    s.transition = settings.defaultTransition;
+                    s.transitionOptions = settings.defaultTransitionOptions;
+                }
+            }
+        }
     }
 
     function setupPostMessage() {
@@ -378,7 +400,7 @@
 
     function autoplay(){
         if (settings.autoplay){
-            slidesAttributes.autoplayId = window.setInterval(nextSlide, settings.autoplayTiming);
+            slidesAttributes.autoplayId = window.setInterval(next, settings.autoplayTiming);
         }else{
             window.clearInterval(slidesAttributes.autoplayId);
             slidesAttributes.autoplayId = null;
@@ -403,20 +425,110 @@
         selector.end.appendChild(img);
     }
 
+    function updateControls() {
+        if (slidesAttributes.slideActive <= 0){
+            selector.controls.firstElementChild.style.visibility = 'hidden';
+            selector.controls.lastElementChild.style.visibility = 'visible';
+        } else if (slidesAttributes.slideActive === slidesAttributes.nbSlide){
+            selector.controls.firstElementChild.style.visibility = 'visible';
+            selector.controls.lastElementChild.style.visibility = 'hidden';
+        }
+        else {
+            selector.controls.firstElementChild.style.visibility = 'visible';
+            selector.controls.lastElementChild.style.visibility = 'visible';
+        }
+    }
+
     function updateProgress() {
         selector.progress.style.width = slidesAttributes.slideActive / slidesAttributes.nbSlide * 100 + "%";
     }
 
-    function previousSlide(){
-
+    function previous(){
+        if (slidesAttributes.slideActive > 0) {
+            transition(false);
+        }
     }
 
-    function nextSlide(){
-
+    function next(){
+        if (slidesAttributes.slideActive < slidesAttributes.nbSlide) {
+            transition(true);
+            if(slidesAttributes.slideActive === slidesAttributes.nbSlide && settings.autoplay)
+                toggleAutoplay(document.querySelector('#autoplay').firstElementChild);
+        }
     }
 
-    function goSlide(){
+    function go(s, a){
+        if (s >= 0 && s < slidesAttributes.nbSlide){
+            if (s !== slidesAttributes.slideActive){
+                if (slidesAttributes.slideActive !== slidesAttributes.nbSlide) selector.slides.children[slidesAttributes.slideActive].style.visibility = 'hidden';
+                else selector.end.dataset.end = 'false';
+                slidesAttributes.slideActive = s;
+                selector.slides.children[slidesAttributes.slideActive].style.visibility = 'visible';
+                if (settings.autoplay) { //restart
+                    toggleAutoplay(); //stop
+                    toggleAutoplay(); //start
+                }
+                updateControls();
+                updateProgress();
+            }
+        }
+    }
+    
+    function transition(next){
+        if (slidesAttributes.slideActive === slidesAttributes.nbSlide - 1 && next && !settings.loop) {
+            selector.slides.children[slidesAttributes.slideActive].style.visibility = 'hidden';
+            selector.end.dataset.end = 'true';
+            slidesAttributes.slideActive++;
+            updateControls();
+            updateProgress();
+            return;
+        }
+        if (slidesAttributes.slideActive === slidesAttributes.nbSlide && !next) {
+            selector.slides.children[slidesAttributes.slideActive - 1].style.visibility = 'visible';
+            selector.end.dataset.end = 'false';
+            slidesAttributes.slideActive--;
+            updateControls();
+            updateProgress();
+            return;
+        }
 
+        let p, n, transitionName, transitionOptions;
+
+        if (slidesAttributes.slideActive === -1) {
+            p = -1;
+            n = 0;
+            slidesAttributes.slideActive = n;
+        }
+        else if (next) {
+            p = slidesAttributes.slideActive;
+            if (slidesAttributes.slideActive !== slidesAttributes.nbSlide - 1) n = slidesAttributes.slideActive + 1;
+            else n = 0;
+            slidesAttributes.slideActive = n;
+        }
+        else {
+            p = slidesAttributes.slideActive - 1;
+            n = slidesAttributes.slideActive;
+            slidesAttributes.slideActive = p;
+        }
+
+        transitionName = selector.slides.children[n].dataset.transition;
+        if (p !== -1) p = selector.slides.children[p];
+        n = selector.slides.children[n];
+        if (transitionName === undefined){
+            if (next) {
+                if (p !== -1) p.style.visibility = 'hidden';
+                n.style.visibility = 'visible';
+            } else {
+                p.style.visibility = 'visible';
+                n.style.visibility = 'hidden';
+            }
+        } else {
+            if (p === -1) p = null;
+            transitionOptions = JSON.parse(selector.slides.children[n].dataset.transitionOptions);
+            window[transitionName].apply(p, n, transitionOptions, next);
+        }
+        updateControls();
+        updateProgress();
     }
 
     function toggleChecked(el){
@@ -440,9 +552,9 @@
 
     Projector = {
         start: start,
-        previousSlide: previousSlide,
-        nextSlide: nextSlide,
-        goSlide: goSlide,
+        previous: previous,
+        next: next,
+        go: go,
         toggleFullscreen: toggleFullscreen,
         togglePause: togglePause,
         toggleMenu: toggleMenu,
@@ -455,7 +567,8 @@
         toggleAutoplay: toggleAutoplay,
         toggleResize: toggleResize,
         settings: settings,
-        selector: selector
+        selector: selector,
+        slidesAttributes: slidesAttributes
     };
 
     return Projector;
