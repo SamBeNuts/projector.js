@@ -109,12 +109,26 @@ textarea
 /******* IMPART STYLES *******/
 
 $color_black: #1e1e1e
+$color_dark_grey: #939393
 $color_grey: #a8a8a8
+$color_light_grey: #d3d3d3
 $color_pink: #d96a6a
 $color_white: #e0e0e0
 
 body
   font-family: Arial, Helvetica, sans-serif
+
+::-webkit-scrollbar
+  width: 12px
+  background-color: $color_white
+::-webkit-scrollbar-thumb
+  border-radius: 6px
+  background-color: $color_grey
+  border-width: 2px 2px 2px 2px
+  border-style: solid
+  border-color: $color_white
+  &:hover
+    background-color: $color_dark_grey
 
 a
   text-decoration: none
@@ -161,15 +175,15 @@ p
   margin: 3px
 
 .checkbox
+  position: relative
+  display: flex
+  align-items: center
+  cursor: pointer
   div
     position: relative
     width: 14px
     height: 14px
-    margin: 5px 5px 5px 0
     border: 1px $color_grey solid
-    cursor: pointer
-    display: inline-block
-    vertical-align: middle
     transition: border-color 300ms ease
   &.checked div::before
     content: ''
@@ -177,7 +191,7 @@ p
     border-color: $color_black
     border-style: solid
     border-width: 0 5px 5px 0
-    height: 14px
+    height: 12px
     width: 7px
     top: 0
     left: 0
@@ -188,29 +202,82 @@ p
     border-color: $color_black
   &.checked div
     border: none
-    margin: 6px 6px 6px 1px
+    margin-right: 1px
   span
-    display: inline-block
+    position: relative
     font-size: 16px
-    padding-top: 2px
-    vertical-align: middle
+    flex-grow: 1
+
+.select
+  position: relative
+  width: 100%
+  height: auto
+  .option_select
+    position: relative
+    display: flex
+    align-items: center
+    width: 100%
+    height: auto
+    background-color: $color_light_grey
+    padding: 3px 7px
+    box-sizing: border-box
+    cursor: pointer
+    transition: background-color 300ms ease
+    &:hover
+      background-color: $color_grey
+    span
+      flex-grow: 1
+    div
+      width: 7px
+      height: 7px
+      border-width: 0 0 2px 2px
+      border-color: black
+      border-style: solid
+      transform: rotate(225deg)
+      margin: 2px
+      transition: transform 300ms ease
+    &:hover div
+      transform: rotate(315deg) translate(2px, -1px)
+  .options
+    position: absolute
+    bottom: 0
+    left: 0
+    width: 100%
+    transform: translateY(100%)
+    visibility: hidden
+    p
+      position: relative
+      width: 100%
+      background-color: $color_light_grey
+      padding: 3px 7px
+      margin: 0
+      border-top: 1px solid white
+      cursor: pointer
+      &:hover
+        background-color: $color_grey
+  &.active .option_select
+    background-color: $color_grey
+    div
+      transform: rotate(315deg) translate(2px, -1px)
+  &.active .options
+    visibility: visible
 
 /******* OBJECT DEFAULT STYLES *******/
 
 .object
   position: absolute
   text-align: center
-
-.object a
-  color: #ffffff
-
-.object img
-  width: 100%
-  height: 100%
+  &.anim
+    visibility: hidden
+  a
+    color: #ffffff
+  img
+    width: 100%
+    height: 100%
 
 /******* SLIDES *******/
 
-html, body, .slide, .upper_layer, .pause, .loading, .end
+html, body, .slide, .background, .upper_layer, .pause, .loading, .end
   position: absolute
   top: 0
   left: 0
@@ -220,25 +287,21 @@ html, body, .slide, .upper_layer, .pause, .loading, .end
 body
   background-color: $color_black
 
-body, .slides
+body, .slides, .backgrounds, .slide, .background
   overflow: hidden
 
-.slides
+.slides, .backgrounds
   position: absolute
   left: 50%
   top: 50%
   transform: translate(-50%, -50%)
-
-.slide
-  visibility: hidden
-
-.past, .active, .future
-  visibility: visible
+  .slide, .background
+    display: none
 
 /******* PROJECTOR ELEMENTS *******/
 
 .pause, .end
-  visibility: hidden
+  display: none
   background-color: $color_black
   text-align: center
   color: $color_white
@@ -253,15 +316,15 @@ body, .slides
     font-size: 60px
 
 .pause[data-pause='true'], .end[data-end='true']
-  visibility: visible
+  display: block
 
 .controls
   position: absolute
   bottom: 15px
   right: 25px
-  visibility: hidden
+  display: none
   &[data-controls='true']
-    visibility: visible
+    display: block
   img:first-child
     transform: rotate(180deg)
     margin-right: 15px
@@ -273,12 +336,15 @@ body, .slides
     transition: opacity 300ms ease
     &:hover
       opacity: 1
+    &.disabled
+      opacity: 0
+      cursor: default
 
 .upper_layer
-  visibility: visible
+  display: block
   cursor: default
   &[data-selection='true']
-    visibility: hidden
+    display: none
   &[data-cursor='false']
     cursor: none
 
@@ -287,29 +353,33 @@ body, .slides
   position: absolute
   left: 0
   bottom: 0
-  width: 0
+  width: 100%
   height: 5px
   background-color: $color_pink
-  visibility: hidden
-  transition: width 300ms ease
+  display: none
+  transform-origin: left
+  transition: transform 300ms ease
   &[data-progress='true']
-    visibility: visible
+    display: block
 
 .menu
   position: absolute
   height: 100%
   max-height: 100%
-  width: auto
-  max-width: 350px
+  width: 300px
   top: 0
   left: 0
   display: flex
   flex-direction: column
   transform: translateX(-100%)
   background-color: $color_white
-  transition: transform 100ms ease
+  transition: transform 200ms ease
   &[data-menu='true']
     transform: translateX(0)
+    .open_close_btn
+      opacity: 0.4
+      img
+        transform: rotate(180deg)
   .top_logo
     position: relative
     text-align: center
@@ -335,7 +405,7 @@ body, .slides
       line-height: 25px
   .content
     position: relative
-    width: auto
+    width: 100%
     padding: 15px
     color: $color_black
     line-height: 20px
@@ -343,7 +413,10 @@ body, .slides
     font-variant: small-caps
     overflow-y: auto
     flex-grow: 1
+    box-sizing: border-box
     .content_part
+      position: relative
+      width: 100%
       margin-bottom: 15px
       &:last-child
         margin-bottom: 0
@@ -356,5 +429,23 @@ body, .slides
         color: $color_grey
         font-size: 14px
       .shortcut
-        line-height: 16px
-        font-size: 14px
+        font-size: 16px
+  .open_close_btn
+    width: auto
+    height: auto
+    position: absolute
+    right: 0
+    top: 50%
+    transform: translate(100%, -50%)
+    background-color: #a8a8a8
+    opacity: 0
+    border-radius: 0 10px 10px 0
+    transition: opacity 200ms ease
+    cursor: pointer
+    &:hover
+      opacity: 0.6
+    img
+      height: 40px
+      width: auto
+      padding: 20px 15px
+      transition: transform 200ms ease

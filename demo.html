@@ -7,25 +7,134 @@
 </head>
 <body>
 <div class="slides">
-    <div class="slide">
-        <div class="object" data-object-type="text" style="top: 500px; left: 660px; height: auto; width: 600px;">
+    <div class="slide" data-transition="ge8D5ezJ9d" data-transition-options='{"duration": 2000, "direction": "fromTop"}'
+         data-background='{"type": "color", "value": "rgba(217,106,106,1)"}'>
+        <div class="object" data-object-id="1" data-object-type="text"
+             style="top: 500px; left: 660px; height: auto; width: 600px;">
             <p style="color: #ffffff; font-size: 80px;">Hello world !</p>
         </div>
     </div>
-    <div class="slide">
-        <div class="object" data-object-type="image" style="top: 27px; left: 192px; height: auto; width: 1536px;">
+    <div class="slide" data-transition="z6A5dz64dD" data-transition-options='{"duration": 1000}'
+         data-background='{"type": "color", "value": "rgba(217,106,106,1)"}'
+         data-animation='{"targetId": "3", "animation": "uZ4dadF54d", "trigger": "after", "delay": 0, "options": {"duration": 250}}|
+{"targetId": "5", "animation": "uZ4dadF54d", "trigger": "after", "delay": 1000, "options": {"duration": 250}}|
+{"targetId": "6", "animation": "uZ4dadF54d", "trigger": "after", "delay": 0, "options": {"duration": 250}}|
+{"targetId": "7", "animation": "uZ4dadF54d", "trigger": "click", "delay": 0, "options": {"duration": 250}}'>
+        <div class="object" data-object-id="2" data-object-type="image"
+             style="top: 27px; left: 192px; height: auto; width: 1536px;">
             <img src="core-utils/media/3mockup.png">
         </div>
+        <div class="object anim" data-object-id="3" data-object-type="text"
+             style="top: 500px; left: 660px; height: auto; width: 600px;">
+            <p style="color: #000000; font-size: 80px;">Hello world !</p>
+        </div>
+        <div class="object anim" data-object-id="5" data-object-type="text"
+             style="top: 600px; left: 660px; height: auto; width: 600px;">
+            <p style="color: #000000; font-size: 80px;">Hello world !</p>
+        </div>
+        <div class="object anim" data-object-id="6" data-object-type="text"
+             style="top: 700px; left: 660px; height: auto; width: 600px;">
+            <p style="color: #000000; font-size: 80px;">Hello world !</p>
+        </div>
+        <div class="object anim" data-object-id="7" data-object-type="text"
+             style="top: 800px; left: 660px; height: auto; width: 600px;">
+            <p style="color: #000000; font-size: 80px;">Hello world !</p>
+        </div>
     </div>
-    <div class="slide">
-        <div class="object" data-object-type="text" style="top: 500px; left: 660px; height: auto; width: 600px;">
+    <div class="slide" data-transition="ge8D5ezJ9d"
+         data-transition-options='{"duration": 1000, "direction": "fromRight"}'>
+        <div class="object" data-object-id="4" data-object-type="text"
+             style="top: 500px; left: 660px; height: auto; width: 600px;">
             <p style="color: #ffffff; font-size: 80px;">Goodbye world !</p>
         </div>
     </div>
 </div>
-<script src="core-utils/js/projector.js"></script>
+<div class="menu" data-menu="true">
+    <div class="top_logo"><a href="https://www.impart.com"><img src="core-utils/media/logo_negative.png"></a></div>
+    <div class="content">
+        <div class="content_part"><p class="title" data-trad="options_title"></p>
+            <div class="option">
+                <div class="checkbox" id="fullscreen" onclick="Projector.toggleFullscreen();"><span
+                        data-trad="fullscreen_option"></span>
+                    <div></div>
+                </div>
+            </div>
+            <div class="option">
+                <div class="checkbox checked" id="controls" onclick="Projector.toggleControls(this);"><span
+                        data-trad="controls_option"></span>
+                    <div></div>
+                </div>
+            </div>
+            <div class="option">
+                <div class="checkbox checked" id="mousewheel" onclick="Projector.toggleMouseWheel(this);">
+                    <span data-trad="mousewheel_option"></span>
+                    <div></div>
+                </div>
+                <p class="info" data-trad="mousewheel_option_info"></p></div>
+            <div class="option">
+                <div class="select" id="cursor" onclick="Projector.toggleCursorVisible(this);">
+                    <span data-trad="cursor_option"></span>
+                    <div class="option_select">
+                        <span>Toujours</span>
+                        <div></div>
+                    </div>
+                    <div class="options">
+                        <p>Toujours</p>
+                        <p>Jamais</p>
+                        <p>Si inactif</p>
+                    </div>
+                </div>
+            </div>
+            <div class="option">
+                <div class="checkbox checked" id="selection" onclick="Projector.toggleSelection(this);"><span
+                        data-trad="selection_option"></span>
+                    <div></div>
+                </div>
+                <p class="info" data-trad="selection_option_info"></p></div>
+            <div class="option">
+                <div class="checkbox checked" id="progress" onclick="Projector.toggleProgress(this);"><span
+                        data-trad="progress_option"></span>
+                    <div></div>
+                </div>
+            </div>
+            <div class="option">
+                <div class="checkbox" id="loop" onclick="Projector.toggleLoop(this);"><span data-trad="loop_option"></span>
+                    <div></div>
+                </div>
+                <p class="info" data-trad="loop_option_info"></p>
+            </div>
+            <div class="option">
+                <div class="checkbox" id="autoplay" onclick="Projector.toggleAutoplay(this);"><span
+                        data-trad="autoplay_option"></span>
+                    <div></div>
+                </div>
+                <p class="info" data-trad="autoplay_option_info"></p>
+            </div>
+            <div class="option">
+                <div class="checkbox checked" id="resize" onclick="Projector.toggleResize(this);"><span
+                        data-trad="resize_option"></span>
+                    <div></div>
+                </div>
+                <p class="info" data-trad="resize_option_info"></p></div>
+        </div>
+        <div class="content_part"><p class="title" data-trad="shortcuts_title"></p>
+            <p class="shortcut" data-trad="shortcut_fullscreen"></p>
+            <p class="shortcut" data-trad="shortcut_menu"></p>
+            <p class="shortcut" data-trad="shortcut_previous"></p>
+            <p class="shortcut" data-trad="shortcut_next"></p>
+            <p class="shortcut" data-trad="shortcut_pause"></p>
+            <p class="shortcut" data-trad="shortcut_restart"></div>
+    </div>
+    <div class="bottom_stop" onclick="window.close();"><p data-trad="stop_presenting"></p></div>
+    <div class="open_close_btn" onclick="Projector.toggleMenu()"><img
+            src="core-utils/media/projector_controls_icon.png"></div>
+</div>
+<script src="core-utils/js/projector.min.js"></script>
 <script>
     Projector.start();
 </script>
+<script src="core-utils/js/z6A5dz64dD.js"></script>
+<script src="core-utils/js/ge8D5ezJ9d.js"></script>
+<script src="core-utils/js/uZ4dadF54d.js"></script>
 </body>
 </html>
