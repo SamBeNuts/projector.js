@@ -49,7 +49,7 @@
         initialized: false,
         loaded: false,
         nbSlide: 0,
-        menu: true,
+        menu: false,
         pause: false,
         scale: 1,
         selection: false,
@@ -176,7 +176,7 @@
         window.addEventListener('hashchange', goHash, false);
 
         document.addEventListener("keydown", function(key) {
-            if (key.code === "F5" || key.code === "Escape" || key.code === "F11")
+            if (key.code === "Escape" || key.code === "F11")
                 key.preventDefault();
         }, false);
 
@@ -187,7 +187,7 @@
                 toggleMenu();
             else if (key.code === "KeyR")
                 go(0, 0);
-            else if (key.code === "Escape" || key.code === "F5" || key.code === "F11" || key.code === "KeyF")
+            else if (key.code === "Escape" || key.code === "F11" || key.code === "KeyF")
                 toggleFullscreen();
             else if ((key.code === "ArrowLeft" || key.code === "ArrowDown" || key.code === "Backspace") &&
                 !slidesAttributes.pause)
@@ -374,6 +374,18 @@
                     color.style.height = '100%';
                     color.style.backgroundColor = bg.value;
                     div.appendChild(color);
+                }else if (bg.type === 'image'){
+                    let image = document.createElement('div');
+                    image.style.position = 'absolute';
+                    image.style.top = '0';
+                    image.style.left = '0';
+                    image.style.width = '100%';
+                    image.style.height = '100%';
+                    image.style.backgroundImage = 'url("' + bg.src + '")';
+                    image.style.backgroundSize = bg.size;
+                    image.style.backgroundPosition = bg.position;
+                    image.style.backgroundRepeat = bg.repeat;
+                    div.appendChild(image);
                 }
             }
             backgrounds.appendChild(div);
@@ -417,7 +429,7 @@
                 });
                 slidesAttributes.animationIndex = 0;
             }
-            else slidesAttributes.animationIndex = slidesAttributes.animationTimeline[slidesAttributes.slideActive].length;
+            else doDefaultAnimation(slidesAttributes.animationTimeline[slidesAttributes.slideActive].length);
         }
     }
 
@@ -618,7 +630,7 @@
                 updateControls();
                 updateProgress();
             }
-            if (a !== slidesAttributes.animationActive){
+            if (a !== 0){
                 if (!updateAnim) updateAnimations(true);
                 doDefaultAnimation(a);
                 checkNextAnimation(a, true, true);
@@ -773,7 +785,7 @@
                     p.style.cssText = '';
                     bg_p.style.cssText = '';
                 }
-                checkNextAnimation(0, true, true);
+                if (!reverse) checkNextAnimation(0, true, true);
             }
         }
         id = requestAnimationFrame(step);
